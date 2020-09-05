@@ -74,11 +74,11 @@ bool isZero (double value, double precison = PRECISION);
 /*!
     \brief Тесты для функции SolveSquare().
 */
-void Test();
+void TestSolveSquare();
 
 int main()
     {
-    //Test();
+    //TestSolveSquare();
 
     printf ("\nSquare equation solver\n\n"
             "Equation: ax^2 + bx + c = 0\n"
@@ -201,7 +201,7 @@ bool isZero (double value, double precison)
 
 //-----------------------------------------------------------------------------
 
-void Test()
+void TestSolveSquare()
     {
 
         {
