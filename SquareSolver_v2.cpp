@@ -19,7 +19,7 @@ const int    INF            = -1;
            устанавливает погрешность, согласно
            которой число считается равным 0.
 */
-const double PRECISION      = 1E-20;
+const double PRECISION      = 1E-8;
 
 /*!
    \brief Находит корни квадратного уравнения
@@ -308,6 +308,18 @@ void TestSolveSquare()
             printf("Test 8 BAD! isZero(x1 + x2 + 2 / 0.01) = false\n");
         else
             printf("Test 8 OK\n");
+        }
+    
+        {
+        double x1, x2;
+        int nRoots = SolveSquare(PRECISION, 2*PRECISION, PRECISION,
+                                 &x1, &x2);
+        if(!isZero(nRoots - 1))
+            printf("Test 9 BAD! isZero(nRoots - 1) = false\n");
+        if(!isZero(x1 + 1))
+            printf("Test 9 BAD! !isZero(x1 + 1) = false\n");
+        else
+            printf("Test 9 OK\n");
         }
 
     }
