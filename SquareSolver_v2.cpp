@@ -19,7 +19,7 @@ const int    INF            = -1;
            устанавливает погрешность, согласно
            которой число считается равным 0.
 */
-const double PRECISION      = 1E-8;
+const double PRECISION      = 1E-5;
 
 /*!
    \brief Находит корни квадратного уравнения
@@ -80,7 +80,7 @@ void TestSolveSquare();
 
 int main()
     {
-    //TestSolveSquare();
+    TestSolveSquare();
 
     int i = 0;
 
@@ -94,7 +94,7 @@ int main()
                 "Plese, try again: ");
 
     double x1 = NAN, x2 = NAN;
-    int nRoots = SolveSquare (1e-20, 2*1e-20, 1e-20, &x1, &x2);
+    int nRoots = SolveSquare (a, b, c, &x1, &x2);
 
     switch (nRoots)
         {
@@ -117,7 +117,6 @@ int main()
     return 0;
     }
 
-
 //-----------------------------------------------------------------------------
 
 int GetArgs (double *pa, double *pb, double *pc,
@@ -125,6 +124,11 @@ int GetArgs (double *pa, double *pb, double *pc,
     {
     char input_str[str_size + 1];
     fgets (input_str, str_size, stdin);
+
+    for (size_t i = 0; *(input_str + i) != NULL && i < str_size; ++i)
+        if (*(input_str + i) == ',')
+            *(input_str + i) = '.';
+
     double empty_num; /* check for another nums */
 
     int nArgs = sscanf (input_str, "%lg%lg%lg%lg", pa, pb, pc,
@@ -132,9 +136,6 @@ int GetArgs (double *pa, double *pb, double *pc,
 
     return nArgs;
     }
-
-//-----------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------------------------
 
@@ -194,9 +195,6 @@ int SolveSquare (double a, double b, double c,
 
 //-----------------------------------------------------------------------------
 
-
-//-----------------------------------------------------------------------------
-
 bool isZero (double value, double precison)
     {
     return fabs(value) < precison;
@@ -229,100 +227,39 @@ double GetDiscriminant (double a, double b, double c)
 void TestSolveSquare()
     {
 
-        {
-        double x1, x2;
-        int nRoots = SolveSquare(0, 0, 0, &x1, &x2);
-        if(!isZero(nRoots - INF))
-            printf("Test 1 BAD! isZero(nRoots - INF) = false\n");
-        else
-            printf("Test 1 OK\n");
+    #define Test(test_num, a, b, c, right_num_roots, right_x1, right_x2)            \
+        {                                                                           \
+        double x1 = 0, x2 = 0;                                                      \
+        int nRoots = SolveSquare((a), (b), (c),                                     \
+                                 &x1, &x2);                                         \
+        if(!isZero(nRoots - (right_num_roots)))                                     \
+            printf("Test %d BAD! Num of roots is %d, but expected %d\nline: %d\n"   \
+                              , (test_num), nRoots, (right_num_roots), __LINE__);   \
+        if(!isZero(x1 - (right_x1)))                                                \
+            printf("Test %d BAD! x1 is %lg, but expected %lg\nline: %d\n"           \
+                              , (test_num), x1, (right_x1), __LINE__);              \
+        if(!isZero(x2 - (right_x2)))                                                \
+            printf("Test %d BAD! x2 is %lg, but expected %lg\nline: %d\n"           \
+                              , (test_num), x2, (right_x2), __LINE__);              \
+        else                                                                        \
+            printf("Test %d OK\n", test_num);                                       \
+                                                                                    \
+        ++(test_num);                                                               \
         }
 
-        {
-        double x1, x2;
-        int nRoots = SolveSquare(0, 0, 1, &x1, &x2);
-        if(!isZero(nRoots - 0))
-            printf("Test 2 BAD! isZero(nRoots - 0) = false\n");
-        else
-            printf("Test 2 OK\n");
-        }
+        int test_num = 1;
 
-        {
-        double x1, x2;
-        int nRoots = SolveSquare(0, 1, 0, &x1, &x2);
-        if(!isZero(nRoots - 1)) printf("Test 3 Bad! isZero(nRoots - 1)) = false\n");
-        if(!isZero(x1))         printf("Test 3 Bad! isZero(x1) = false\n");
-        if(!isZero(x2))         printf("Test 3 Bad! isZero(x2) = false\n");
-        else
-            printf("Test 3 OK\n");
-        }
+        Test (test_num, 0, 0,  0, INF,  0,  0)
+        Test (test_num, 0, 0,  1, 0,    0,  0)
+        Test (test_num, 0, 1,  0, 1,    0,  0)
+        Test (test_num, 0, 1,  2, 1,   -2, -2)
+        Test (test_num, 1, 0,  0, 1,    0,  0)
+        Test (test_num, 1, 2,  1, 1,   -1, -1)
 
-        {
-        double x1, x2;
-        int nRoots = SolveSquare(0, 1, 2, &x1, &x2);
-        if(!isZero(nRoots - 1)) printf("Test 4 BAD! isZero(nRoots - 1) = false\n");
-        if(!isZero(x1 + 2))     printf("Test 4 BAD! isZero(x1 + 2) = false\n");
-        if(!isZero(x2 + 2))     printf("Test 4 BAD! isZero(x2 + 2) = false\n");
-        else
-            printf("Test 4 OK\n");
-        }
+        Test (test_num, 1, 2, -1, 2, 0.414214, -2.414214)
 
-        {
-        double x1, x2;
-        int nRoots = SolveSquare(1, 0, 0, &x1, &x2);
-        if(!isZero(nRoots - 1)) printf("Test 5 BAD! isZero(nRoots - 1) = false\n");
-        if(!isZero(x1))         printf("Test 5 BAD! isZero(x1) = false\n");
-        if(!isZero(x2))         printf("Test 5 BAD! isZero(x2) = false\n");
-        else
-            printf("Test 5 OK\n");
-        }
-
-        {
-        double x1, x2;
-        int nRoots = SolveSquare(1, 2, 1, &x1, &x2);
-        if(!isZero(nRoots - 1)) printf("Test 6 BAD! isZero(nRoots - 1) = false\n");
-        if(!isZero(x1 + 1))     printf("Test 6 BAD! isZero(x1 + 1) = false\n");
-        if(!isZero(x2 + 1))     printf("Test 6 BAD! isZero(x2 + 1) = false\n");
-        else
-            printf("Test 6 OK\n");
-        }
-
-        {
-        double x1, x2;
-        int nRoots = SolveSquare(1, 2, -1, &x1, &x2);
-        if(!isZero(nRoots - 2))  printf("Test 7 BAD! isZero(nRoots - 2) = fasle\n");
-        if(!isZero(x1 * x2 + 1)) printf("Test 7 BAD! isZero(x1 * x2 + 1) = fasle\n");
-        if(!isZero(x1 + x2 + 2)) printf("Test 7 BAD! isZero(x1 + x2 + 2) = fasle\n");
-        else
-            printf("Test 7 OK\n");
-        }
-
-        {
-        double x1, x2;
-        int nRoots = SolveSquare(0.01, 2, -0.001, &x1, &x2);
-        if(!isZero(nRoots - 2))
-            printf("Test 8 BAD! isZero(nRoots - 2) = false\n");
-        if(!isZero(x1 * x2 + 0.001 / 0.01))
-            printf("Test 8 BAD! isZero(x1 * x2 + 0.001 / 0.01) = false\n");
-        if(!isZero(x1 + x2 + 2 / 0.01))
-            printf("Test 8 BAD! isZero(x1 + x2 + 2 / 0.01) = false\n");
-        else
-            printf("Test 8 OK\n");
-        }
-    
-        {
-        double x1, x2;
-        int nRoots = SolveSquare(PRECISION, 2*PRECISION, PRECISION,
-                                 &x1, &x2);
-        if(!isZero(nRoots - 1))
-            printf("Test 9 BAD! isZero(nRoots - 1) = false\n");
-        if(!isZero(x1 + 1))
-            printf("Test 9 BAD! !isZero(x1 + 1) = false\n");
-        else
-            printf("Test 9 OK\n");
-        }
+        Test (test_num, PRECISION, 2*PRECISION, PRECISION, 1, -1, -1)
 
     }
 
 //-----------------------------------------------------------------------------
-
